@@ -5,43 +5,109 @@ class ChatWindow extends Plugin {
   constructor(player, options = {}) {
     super(player, options);
     this.options_ = options;
+    this.isVisible = false;
 
     player.ready(() => {
-      if (this.container) return;
+      // Remove Picture-in-Picture (if present)
+      if (player.controlBar && player.controlBar.pictureInPictureToggle) {
+        player.controlBar.pictureInPictureToggle.hide();
+      }
 
-      this.container = videojs.dom.createEl('div', {
-        className: 'vjs-chat-window'
-      });
+      // Create chat box if not exists
+      if (!this.container) {
+        this.container = videojs.dom.createEl('div', {
+          className: 'vjs-chat-window'
+        });
 
-      this.messages = videojs.dom.createEl('div', {
-        className: 'vjs-chat-messages'
-      });
-      this.messages.setAttribute('role', 'log');
-      this.messages.setAttribute('aria-live', 'polite');
+        this.messages = videojs.dom.createEl('div', {
+          className: 'vjs-chat-messages'
+        });
+        this.messages.setAttribute('role', 'log');
+        this.messages.setAttribute('aria-live', 'polite');
 
-      this.input = videojs.dom.createEl('input', {
-        className: 'vjs-chat-input',
-        type: 'text',
-        placeholder: options.placeholder || 'Type a message…'
-      });
-      this.input.setAttribute('aria-label', 'Chat input');
+        this.input = videojs.dom.createEl('input', {
+          className: 'vjs-chat-input',
+          type: 'text',
+          placeholder: options.placeholder || 'Type a message…'
+        });
+        this.input.setAttribute('aria-label', 'Chat input');
 
-      this.container.appendChild(this.messages);
-      this.container.appendChild(this.input);
-      player.el().appendChild(this.container);
+        this.container.appendChild(this.messages);
+        this.container.appendChild(this.input);
 
-      this._onKeyDown = (e) => {
-        if (e.key === 'Enter' && this.input.value.trim()) {
-          this.addMessage(options.username || 'You', this.input.value.trim());
-          this.input.value = '';
-        }
-      };
-      this.input.addEventListener('keydown', this._onKeyDown);
+        // Attach to control bar so position is stable in fullscreen
+        player.controlBar.el().appendChild(this.container);
 
-      player.addClass('vjs-has-chat-window');
+        this._onKeyDown = (e) => {
+          if (e.key === 'Enter' && this.input.value.trim()) {
+            this.addMessage(options.username || 'You', this.input.value.trim());
+            this.input.value = '';
+          }
+        };
+        this.input.addEventListener('keydown', this._onKeyDown);
+      }
+
+      this.addToggleButton(player);
 
       this.on(player, 'dispose', () => this.dispose());
     });
+  }
+
+  addToggleButton(player) {
+    const Button = videojs.getComponent('Button');
+    const plugin = this;
+
+    class ChatToggleButton extends Button {
+      constructor(player, options) {
+        super(player, options);
+        this.controlText('Chat');
+        this.addClass('vjs-chat-toggle');
+
+        const ph = this.el().querySelector('.vjs-icon-placeholder');
+        if (ph) {
+          ph.innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18"
+                 stroke="currentColor" fill="none" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round"
+                 style="pointer-events:none">
+              <path d="M12 22l3-3h3a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H6A3 3 0 0 0 3 5v11a3 3 0 0 0 3 3h3l3 3z" />
+              <path d="M8 9h8" />
+              <path d="M8 13h5" />
+            </svg>
+          `;
+        }
+      }
+      handleClick() {
+        plugin.toggleChat();
+      }
+    }
+
+    const cb = player.controlBar;
+    if (!cb) return;
+
+    const btn = new ChatToggleButton(player);
+
+    // Insert before fullscreen button using Video.js only (no DOM insertBefore)
+    const fs = cb.getChild('FullscreenToggle') || cb.getChild('fullscreenToggle');
+    if (fs) {
+      const index = cb.children().indexOf(fs);
+      cb.addChild(btn, {}, index);
+    } else {
+      cb.addChild(btn);
+    }
+  }
+
+  toggleChat() {
+    this.isVisible = !this.isVisible;
+    if (this.container) {
+      this.container.style.display = this.isVisible ? 'flex' : 'none';
+    }
+    if (this.isVisible) {
+      this.messages.scrollTop = this.messages.scrollHeight;
+      if (this.input) {
+        this.input.focus();
+      }
+    }
   }
 
   addMessage(user, text) {
@@ -51,7 +117,6 @@ class ChatWindow extends Plugin {
       className: 'vjs-chat-message',
       innerHTML: `<strong class="vjs-chat-user"></strong><span class="vjs-chat-text"></span>`
     });
-
     msg.querySelector('.vjs-chat-user').textContent = `${user}: `;
     msg.querySelector('.vjs-chat-text').textContent = text;
 
@@ -66,14 +131,11 @@ class ChatWindow extends Plugin {
     if (this.container?.parentNode) {
       this.container.parentNode.removeChild(this.container);
     }
-    if (this.player_) {
-      this.player_.removeClass('vjs-has-chat-window');
-    }
     super.dispose();
   }
 }
 
-videojs.registerPlugin('chatWindow', function(options) {
+videojs.registerPlugin('chatWindow', function (options) {
   if (!this.chatWindow_) {
     this.chatWindow_ = new ChatWindow(this, options);
   }
