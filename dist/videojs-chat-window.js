@@ -12,16 +12,24 @@
       this.options_ = options;
 
       player.ready(() => {
-        if (this.container) return; // guard if constructed twice
+        if (this.container) return;
 
-        this.container = videojs.dom.createEl('div', { className: 'vjs-chat-window' });
-        this.messages  = videojs.dom.createEl('div', { className: 'vjs-chat-messages', attributes: { role: 'log', 'aria-live': 'polite' } });
-        this.input     = videojs.dom.createEl('input', {
+        this.container = videojs.dom.createEl('div', {
+          className: 'vjs-chat-window'
+        });
+
+        this.messages = videojs.dom.createEl('div', {
+          className: 'vjs-chat-messages'
+        });
+        this.messages.setAttribute('role', 'log');
+        this.messages.setAttribute('aria-live', 'polite');
+
+        this.input = videojs.dom.createEl('input', {
           className: 'vjs-chat-input',
           type: 'text',
-          placeholder: options.placeholder || 'Type a message…',
-          attributes: { 'aria-label': 'Chat input' }
+          placeholder: options.placeholder || 'Type a message…'
         });
+        this.input.setAttribute('aria-label', 'Chat input');
 
         this.container.appendChild(this.messages);
         this.container.appendChild(this.input);
@@ -37,16 +45,18 @@
 
         player.addClass('vjs-has-chat-window');
 
-        // Clean up on dispose
         this.on(player, 'dispose', () => this.dispose());
       });
     }
 
     addMessage(user, text) {
+      if (!this.messages) return;
+
       const msg = videojs.dom.createEl('div', {
         className: 'vjs-chat-message',
         innerHTML: `<strong class="vjs-chat-user"></strong><span class="vjs-chat-text"></span>`
       });
+
       msg.querySelector('.vjs-chat-user').textContent = `${user}: `;
       msg.querySelector('.vjs-chat-text').textContent = text;
 
@@ -55,15 +65,23 @@
     }
 
     dispose() {
-      if (this.input && this._onKeyDown) this.input.removeEventListener('keydown', this._onKeyDown);
-      if (this.container && this.container.parentNode) this.container.parentNode.removeChild(this.container);
-      if (this.player_) this.player_.removeClass('vjs-has-chat-window');
+      if (this.input && this._onKeyDown) {
+        this.input.removeEventListener('keydown', this._onKeyDown);
+      }
+      if (this.container?.parentNode) {
+        this.container.parentNode.removeChild(this.container);
+      }
+      if (this.player_) {
+        this.player_.removeClass('vjs-has-chat-window');
+      }
       super.dispose();
     }
   }
 
   videojs.registerPlugin('chatWindow', function(options) {
-    if (!this.chatWindow_) this.chatWindow_ = new ChatWindow(this, options);
+    if (!this.chatWindow_) {
+      this.chatWindow_ = new ChatWindow(this, options);
+    }
     return this.chatWindow_;
   });
 
