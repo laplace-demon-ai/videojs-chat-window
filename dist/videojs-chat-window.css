@@ -1,0 +1,41 @@
+.vjs-has-chat-window .vjs-tech { outline: none; }
+
+.vjs-chat-window {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 300px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(0,0,0,0.78);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 10;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.vjs-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.vjs-chat-message {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.vjs-chat-input {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  outline: none;
+}
