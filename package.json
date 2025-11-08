@@ -1,5 +1,5 @@
 {
-  "name": "videojs-chat-window",
+  "name": "@laplace-demon-ai/videojs-chat-window",
   "version": "1.0.0",
   "description": "Chat window plugin for Video.js",
   "main": "dist/videojs-chat-window.js",
@@ -13,7 +13,7 @@
     "build": "rollup -c"
   },
   "peerDependencies": {
-    "video.js": "^8.23.4"
+    "video.js": "^8.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.3.1",
@@ -30,9 +30,12 @@
   ],
   "author": "Moe Mizrak",
   "license": "MIT",
-  "repository": { 
+  "repository": {
     "type": "git",
-    "url": "https://github.com/laplace-demon-ai/videojs-chat-window.git" 
+    "url": "https://github.com/laplace-demon-ai/videojs-chat-window.git"
   },
-  "homepage": "https://github.com/laplace-demon-ai/videojs-chat-window#readme"
+  "homepage": "https://github.com/laplace-demon-ai/videojs-chat-window#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
