@@ -6,10 +6,13 @@ yarn-error.log
 # Build output
 dist/*.map
 
-# Optional: OS/System files
+# Don't commit lock file for NPM libraries
+package-lock.json
+
+# Optional – macOS / Windows system files
 .DS_Store
 Thumbs.db
 
-# Optional: IDE files
+# Optional – IDE configs
 .idea/
 .vscode/
