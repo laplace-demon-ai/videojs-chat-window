@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist/*.map
+
+# Optional: OS/System files
+.DS_Store
+Thumbs.db
+
+# Optional: IDE files
+.idea/
+.vscode/

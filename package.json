@@ -1,0 +1,38 @@
+{
+  "name": "videojs-chat-window",
+  "version": "1.0.0",
+  "description": "Chat window plugin for Video.js",
+  "main": "dist/videojs-chat-window.js",
+  "unpkg": "dist/videojs-chat-window.min.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "peerDependencies": {
+    "video.js": "^8.23.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.0.0",
+    "video.js": "^8.0.0"
+  },
+  "keywords": [
+    "videojs",
+    "video.js",
+    "plugin",
+    "chat",
+    "live-chat"
+  ],
+  "author": "Moe Mizrak",
+  "license": "MIT",
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/laplace-demon-ai/videojs-chat-window.git" 
+  },
+  "homepage": "https://github.com/laplace-demon-ai/videojs-chat-window#readme"
+}
