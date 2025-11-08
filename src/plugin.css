@@ -1,3 +1,7 @@
+.video-js {
+  position: relative;
+}
+
 .vjs-has-chat-window .vjs-tech { outline: none; }
 
 .vjs-chat-window {
