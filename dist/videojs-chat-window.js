@@ -12,18 +12,15 @@
       this.options_ = options;
       this.isVisible = false;
 
-      // polling state
       this._polling = false;
       this._lastId = null;
       this._pollController = null;
 
       player.ready(() => {
-        // Optional: hide PiP if present
         if (player.controlBar && player.controlBar.pictureInPictureToggle) {
           player.controlBar.pictureInPictureToggle.hide();
         }
 
-        // Build UI once
         if (!this.container) {
           this.container = videojs.dom.createEl('div', { className: 'vjs-chat-window' });
 
@@ -135,7 +132,7 @@
             session_id: this.options_.sessionId || null
           })
         });
-      } catch (_) { /* silent */ }
+      } catch (_) {}
     }
 
     _startPolling() {
@@ -161,8 +158,6 @@
             if (!res.ok) throw new Error('poll failed');
 
             const data = await res.json();
-            // Expected shape:
-            // { messages: [ { id, type: 'text', user, text } | { id, type:'command', command, args } ] }
             if (data && Array.isArray(data.messages)) {
               for (const m of data.messages) {
                 if (m.id) this._lastId = m.id;
@@ -173,7 +168,6 @@
                 }
               }
             }
-            // immediately continue; server implements long-poll (hold ~25s)
           } catch (_) {
             // brief pause before retry to avoid hot loop on errors
             await new Promise(r => setTimeout(r, 1000));
