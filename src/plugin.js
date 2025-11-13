@@ -43,6 +43,7 @@ class ChatWindow {
             this._sendToServer(text);
           }
         };
+
         this.input.addEventListener('keydown', this._onKeyDown);
       }
 
@@ -52,7 +53,6 @@ class ChatWindow {
         this._startPolling();
       }
 
-      // v8: use player.on, not this.on
       player.on('dispose', () => this.dispose());
     });
   }
@@ -84,15 +84,19 @@ class ChatWindow {
 
     const cb = player.controlBar;
     if (!cb) return;
+
     const btn = new ChatToggleButton(player);
     const fs = cb.getChild('FullscreenToggle') || cb.getChild('fullscreenToggle');
+
     if (fs) cb.addChild(btn, {}, cb.children().indexOf(fs));
     else cb.addChild(btn);
   }
 
   toggleChat() {
     this.isVisible = !this.isVisible;
-    if (this.container) this.container.style.display = this.isVisible ? 'flex' : 'none';
+    if (this.container) {
+      this.container.style.display = this.isVisible ? 'flex' : 'none';
+    }
     if (this.isVisible) {
       this.messages.scrollTop = this.messages.scrollHeight;
       if (this.input) this.input.focus();
@@ -119,6 +123,7 @@ class ChatWindow {
   async _sendToServer(message) {
     const url = this._endpoint('/send');
     if (!url) return;
+
     try {
       await fetch(url, {
         method: 'POST',
@@ -139,6 +144,7 @@ class ChatWindow {
     const poll = async () => {
       while (this._polling) {
         this._pollController = new AbortController();
+
         try {
           const base = this._endpoint('/poll');
           if (!base) return;
@@ -152,9 +158,11 @@ class ChatWindow {
             credentials: this.options_.credentials || 'same-origin',
             signal: this._pollController.signal
           });
-          if (!res.ok) throw new Error('poll failed');
+
+          if (!res.ok) throw new Error();
 
           const data = await res.json();
+
           if (data && Array.isArray(data.messages)) {
             for (const m of data.messages) {
               if (m.id) this._lastId = m.id;
@@ -176,6 +184,7 @@ class ChatWindow {
 
   _executeCommand(type, args = {}) {
     const p = this.player;
+
     switch (type) {
       case 'pause': p.pause(); break;
       case 'play': p.play(); break;
@@ -191,7 +200,6 @@ class ChatWindow {
       case 'loadSource':
         if (args.src && args.type) p.src({ src: args.src, type: args.type });
         break;
-      default: break;
     }
   }
 
@@ -207,7 +215,6 @@ class ChatWindow {
   }
 }
 
-// v8-friendly registration (also works on older versions)
 const registerPlugin =
   (typeof videojs.registerPlugin === 'function' && videojs.registerPlugin) ||
   (typeof videojs.plugin === 'function' && videojs.plugin);
@@ -217,11 +224,7 @@ function chatWindow(options) {
   return this.chatWindow_;
 }
 
-if (!registerPlugin) {
-  // Optional: visible warning if something is really wrong
-  // eslint-disable-next-line no-console
-  console.warn('[videojs-chat-window] Could not find video.js plugin API (registerPlugin/plugin).');
-} else {
+if (registerPlugin) {
   registerPlugin.call(videojs, 'chatWindow', chatWindow);
 }
 

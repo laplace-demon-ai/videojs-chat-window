@@ -1,6 +1,6 @@
 {
   "name": "@laplace-demon-ai/videojs-chat-window",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Chat window plugin for Video.js",
   "main": "dist/videojs-chat-window.js",
   "unpkg": "dist/videojs-chat-window.min.js",

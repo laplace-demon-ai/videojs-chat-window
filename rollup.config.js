@@ -5,7 +5,6 @@ import fs from 'fs';
 const cssSrc = 'src/plugin.css';
 const cssDist = 'dist/videojs-chat-window.css';
 
-// very small "copy css" helper
 const copyCss = {
   name: 'copy-css',
   writeBundle() {
@@ -15,7 +14,6 @@ const copyCss = {
 };
 
 export default [
-  // UMD (non-minified)
   {
     input: 'src/plugin.js',
     output: {
@@ -27,7 +25,6 @@ export default [
     external: ['video.js'],
     plugins: [resolve(), copyCss]
   },
-  // UMD (minified)
   {
     input: 'src/plugin.js',
     output: {
