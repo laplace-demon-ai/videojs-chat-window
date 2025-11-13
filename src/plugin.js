@@ -1,4 +1,6 @@
-import videojs from 'video.js';
+import videojsImport from 'video.js';
+
+const videojs = videojsImport?.default || videojsImport;
 
 class ChatWindow {
   constructor(player, options = {}) {
@@ -206,13 +208,21 @@ class ChatWindow {
 }
 
 // v8-friendly registration (also works on older versions)
-const registerPlugin = videojs.registerPlugin || videojs.plugin;
+const registerPlugin =
+  (typeof videojs.registerPlugin === 'function' && videojs.registerPlugin) ||
+  (typeof videojs.plugin === 'function' && videojs.plugin);
 
 function chatWindow(options) {
   if (!this.chatWindow_) this.chatWindow_ = new ChatWindow(this, options);
   return this.chatWindow_;
 }
 
-registerPlugin('chatWindow', chatWindow);
+if (!registerPlugin) {
+  // Optional: visible warning if something is really wrong
+  // eslint-disable-next-line no-console
+  console.warn('[videojs-chat-window] Could not find video.js plugin API (registerPlugin/plugin).');
+} else {
+  registerPlugin.call(videojs, 'chatWindow', chatWindow);
+}
 
 export default ChatWindow;
