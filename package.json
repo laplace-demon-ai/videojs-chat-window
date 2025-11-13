@@ -1,6 +1,6 @@
 {
   "name": "@laplace-demon-ai/videojs-chat-window",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Chat window plugin for Video.js",
   "main": "dist/videojs-chat-window.js",
   "unpkg": "dist/videojs-chat-window.min.js",
@@ -8,6 +8,11 @@
     "dist/",
     "README.md",
     "LICENSE"
+  ],
+  "sideEffects": [
+    "dist/videojs-chat-window.js",
+    "dist/videojs-chat-window.min.js",
+    "dist/videojs-chat-window.css"
   ],
   "scripts": {
     "build": "rollup -c"

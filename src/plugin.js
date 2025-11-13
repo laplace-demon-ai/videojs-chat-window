@@ -1,9 +1,8 @@
 import videojs from 'video.js';
-const Plugin = videojs.getPlugin('plugin');
 
-class ChatWindow extends Plugin {
+class ChatWindow {
   constructor(player, options = {}) {
-    super(player, options);
+    this.player = player;
     this.options_ = options;
     this.isVisible = false;
 
@@ -51,7 +50,8 @@ class ChatWindow extends Plugin {
         this._startPolling();
       }
 
-      this.on(player, 'dispose', () => this.dispose());
+      // v8: use player.on, not this.on
+      player.on('dispose', () => this.dispose());
     });
   }
 
@@ -164,7 +164,6 @@ class ChatWindow extends Plugin {
             }
           }
         } catch (_) {
-          // brief pause before retry to avoid hot loop on errors
           await new Promise(r => setTimeout(r, 1000));
         }
       }
@@ -174,7 +173,7 @@ class ChatWindow extends Plugin {
   }
 
   _executeCommand(type, args = {}) {
-    const p = this.player();
+    const p = this.player;
     switch (type) {
       case 'pause': p.pause(); break;
       case 'play': p.play(); break;
@@ -197,15 +196,23 @@ class ChatWindow extends Plugin {
   dispose() {
     this._polling = false;
     if (this._pollController) this._pollController.abort();
-    if (this.input && this._onKeyDown) this.input.removeEventListener('keydown', this._onKeyDown);
-    if (this.container?.parentNode) this.container.parentNode.removeChild(this.container);
-    super.dispose();
+    if (this.input && this._onKeyDown) {
+      this.input.removeEventListener('keydown', this._onKeyDown);
+    }
+    if (this.container?.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
   }
 }
 
-videojs.registerPlugin('chatWindow', function (options) {
+// v8-friendly registration (also works on older versions)
+const registerPlugin = videojs.registerPlugin || videojs.plugin;
+
+function chatWindow(options) {
   if (!this.chatWindow_) this.chatWindow_ = new ChatWindow(this, options);
   return this.chatWindow_;
-});
+}
+
+registerPlugin('chatWindow', chatWindow);
 
 export default ChatWindow;
